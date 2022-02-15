@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 import Modal from '../assets/Modal';
 import Alert from '../assets/Alert';
@@ -18,6 +19,7 @@ type NotificationType = Omit<NotificationProps, 'onClose'>;
 // Component
 const ListModal = () => {
   // Hooks
+  const router = useRouter();
   const userState = useUserState();
   const listState = useListState();
   const listDispatch = useListDispatch();
@@ -36,7 +38,13 @@ const ListModal = () => {
   // Effects
   useEffect(() => {
     // When/if we have an authed user, get their lists
-    if (userState.status === 'resolved' && userState.data.auth) {
+    if (
+      listModalState.item &&
+      listModalState.operation &&
+      userState.status === 'resolved' &&
+      userState.data.auth &&
+      listState.lists.status !== 'resolved'
+    ) {
       // If we have an authed user, get their lists as well
       getAllLists()
         .then((lists) => {
@@ -46,28 +54,15 @@ const ListModal = () => {
           listDispatch({ type: 'LISTS_ERROR', error });
         });
     }
-  }, [userState, listDispatch]);
+  }, [listModalState, userState, listState.lists.status, listDispatch]);
 
   useEffect(() => {
-    if (listState.lists.status === 'resolved') {
-      setList((currentList) => {
-        // Don't override if this is already set
-        if (currentList) {
-          return currentList;
-        }
+    if (listState.lists.status === 'resolved' && listState.lists.data.length > 0) {
+      const selectedList = listState.selectedId
+        ? listState.lists.data.find((list) => list.id === listState.selectedId)
+        : undefined;
 
-        // Default to selected list, or first item
-        if (listState.lists.status === 'resolved' && listState.lists.data.length > 0) {
-          const selectedList = listState.selectedId
-            ? listState.lists.data.find((list) => list.id === listState.selectedId)
-            : undefined;
-
-          return selectedList ? selectedList.id : listState.lists.data[0].id;
-        }
-
-        // Nothing to select!
-        return undefined;
-      });
+      setList(selectedList ? selectedList.id : listState.lists.data[0].id);
     }
   }, [listState]);
 
@@ -208,6 +203,12 @@ const ListModal = () => {
     }
   };
 
+  const handleSignedOut = () => {
+    listModalDispatch({ type: 'HIDE_MODAL' });
+
+    router.push('/sign-in');
+  };
+
   // Render
   return (
     <>
@@ -222,9 +223,10 @@ const ListModal = () => {
             <div className="w-36">
               <div className="aspect-w-2 aspect-h-3 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                 {listModalState.item.poster && (
-                  <img
+                  <Image
                     src={`https://www.themoviedb.org/t/p/w220_and_h330_face${listModalState.item.poster}`}
                     alt=""
+                    layout="fill"
                     className="pointer-events-none object-cover"
                   />
                 )}
@@ -305,7 +307,7 @@ const ListModal = () => {
                               </button>
                             </form>
                           ) : (
-                            <>
+                            <div className="flex space-x-2">
                               <div className="w-full">
                                 <label htmlFor="email" className="sr-only">
                                   Email
@@ -332,7 +334,7 @@ const ListModal = () => {
                               >
                                 {submitLoading ? `Please wait...` : `Create list`}
                               </button>
-                            </>
+                            </div>
                           )}
                         </>
                       ) : null}
@@ -373,9 +375,13 @@ const ListModal = () => {
               ) : (
                 <p className="mt-5 text-red-600">
                   You must be{' '}
-                  <Link href="/sign-in">
-                    <a className="underline hover:text-red-700">signed in</a>
-                  </Link>{' '}
+                  <button
+                    type="button"
+                    onClick={handleSignedOut}
+                    className="underline hover:text-red-700"
+                  >
+                    signed in
+                  </button>{' '}
                   to{' '}
                   {listModalState.operation === 'add'
                     ? `add to`

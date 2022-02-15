@@ -95,7 +95,10 @@ const Footer = () => {
               <TwitterIcon className="h-6 w-6" />
             </a>
 
-            <a href="https://github.com/chapmanio" className="text-gray-400 hover:text-gray-500">
+            <a
+              href="https://github.com/chapmanio/movies-next-ssg"
+              className="text-gray-400 hover:text-gray-500"
+            >
               <span className="sr-only">GitHub</span>
               <GitHubIcon className="h-6 w-6" />
             </a>
