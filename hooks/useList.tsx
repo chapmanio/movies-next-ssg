@@ -1,7 +1,6 @@
-import { createContext, useReducer, useContext, useEffect } from 'react';
+import { createContext, useReducer, useContext } from 'react';
 
 import type { ApiError, ApiResponse } from '../lib/api';
-import { getAllLists } from '../lib/api/lists';
 import type { List, ListItem } from '../lib/api/types';
 
 // Types
