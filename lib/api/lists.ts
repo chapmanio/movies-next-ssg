@@ -8,7 +8,7 @@ type UpdateListArgs = {
 };
 
 type AddListItemArgs = {
-  listId: string;
+  listSlug: string;
   mediaType: string;
   tmdbId: number;
   title: string;
@@ -17,7 +17,7 @@ type AddListItemArgs = {
 };
 
 type DeleteListItemArgs = {
-  listId: string;
+  listSlug: string;
   listItemId: string;
 };
 
@@ -57,14 +57,14 @@ export const deleteList = async (slug: string) => {
 };
 
 export const addListItem = async ({
-  listId,
+  listSlug,
   mediaType,
   tmdbId,
   title,
   subtitle,
   posterUrl,
 }: AddListItemArgs) => {
-  return apiFetch<ListItem>(`/list-item/${listId}`, {
+  return apiFetch<ListItem>(`/list-item/${listSlug}`, {
     method: 'POST',
     body: JSON.stringify({
       mediaType,
@@ -76,8 +76,8 @@ export const addListItem = async ({
   });
 };
 
-export const deleteListItem = async ({ listId, listItemId }: DeleteListItemArgs) => {
-  await apiRaw(`/list-item/${listId}/delete/${listItemId}`, {
+export const deleteListItem = async ({ listSlug, listItemId }: DeleteListItemArgs) => {
+  await apiRaw(`/list-item/${listSlug}/delete/${listItemId}`, {
     method: 'POST',
   });
 

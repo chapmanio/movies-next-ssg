@@ -58,11 +58,11 @@ const ListModal = () => {
 
   useEffect(() => {
     if (listState.lists.status === 'resolved' && listState.lists.data.length > 0) {
-      const selectedList = listState.selectedId
-        ? listState.lists.data.find((list) => list.id === listState.selectedId)
+      const selectedList = listState.selectedSlug
+        ? listState.lists.data.find((list) => list.slug === listState.selectedSlug)
         : undefined;
 
-      setList(selectedList ? selectedList.id : listState.lists.data[0].id);
+      setList(selectedList ? selectedList.slug : listState.lists.data[0].slug);
     }
   }, [listState]);
 
@@ -88,7 +88,7 @@ const ListModal = () => {
           listDispatch({ type: 'ADD_LIST', list: newList });
 
           addListItem({
-            listId: newList.id,
+            listSlug: newList.slug,
             mediaType: type.toUpperCase(), // TODO: type safety?
             tmdbId,
             title,
@@ -96,7 +96,7 @@ const ListModal = () => {
             posterUrl: poster,
           })
             .then((listItem) => {
-              listDispatch({ type: 'ADD_LIST_ITEM', id: newList.id, item: listItem });
+              listDispatch({ type: 'ADD_LIST_ITEM', slug: newList.slug, item: listItem });
 
               setNotification({
                 type: 'success',
@@ -132,7 +132,7 @@ const ListModal = () => {
       const { tmdbId, title, type, poster, subTitle } = listModalState.item;
 
       addListItem({
-        listId: list,
+        listSlug: list,
         mediaType: type.toUpperCase(), // TODO: type safety?
         tmdbId,
         title,
@@ -140,7 +140,7 @@ const ListModal = () => {
         posterUrl: poster,
       })
         .then((listItem) => {
-          listDispatch({ type: 'ADD_LIST_ITEM', id: list, item: listItem });
+          listDispatch({ type: 'ADD_LIST_ITEM', slug: list, item: listItem });
 
           setNotification({
             type: 'success',
@@ -178,13 +178,13 @@ const ListModal = () => {
       const { dbId } = listModalState.item;
 
       deleteListItem({
-        listId: listModalState.list.id,
+        listSlug: listModalState.list.slug,
         listItemId: dbId,
       })
         .then(() => {
           listDispatch({
             type: 'REMOVE_LIST_ITEM',
-            id: listModalState.list.id,
+            slug: listModalState.list.slug,
             itemId: dbId,
           });
 
@@ -289,7 +289,7 @@ const ListModal = () => {
                                 onChange={(event) => setList(event.target.value)}
                               >
                                 {listState.lists.data.map((list) => (
-                                  <option key={list.id} value={list.id}>
+                                  <option key={list.slug} value={list.slug}>
                                     {list.name}
                                   </option>
                                 ))}

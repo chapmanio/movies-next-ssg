@@ -8,20 +8,20 @@ type ListAction =
   | { type: 'SET_LISTS'; lists: List[] }
   | { type: 'LISTS_ERROR'; error?: ApiError }
   | { type: 'ADD_LIST'; list: List }
-  | { type: 'UPDATE_LIST'; id: string; list: List }
-  | { type: 'REMOVE_LIST'; id: string }
-  | { type: 'ADD_LIST_ITEM'; id: string; item: ListItem }
-  | { type: 'REMOVE_LIST_ITEM'; id: string; itemId: string }
-  | { type: 'SET_SELECTED_LIST'; id: string }
+  | { type: 'UPDATE_LIST'; slug: string; list: List }
+  | { type: 'REMOVE_LIST'; slug: string }
+  | { type: 'ADD_LIST_ITEM'; slug: string; item: ListItem }
+  | { type: 'REMOVE_LIST_ITEM'; slug: string; itemId: string }
+  | { type: 'SET_SELECTED_LIST'; slug: string }
   | { type: 'CLEAR_SELECTED_LIST' };
 
-type ListState = { lists: ApiResponse<List[]>; selectedId?: string };
+type ListState = { lists: ApiResponse<List[]>; selectedSlug?: string };
 type ListDispatch = (action: ListAction) => void;
 
 // Initial state
 const defaultInitialState: ListState = {
   lists: { status: 'pending' },
-  selectedId: undefined,
+  selectedSlug: undefined,
 };
 
 // Context
@@ -72,7 +72,7 @@ const listReducer = (state: ListState, action: ListAction): ListState => {
       }
 
       const updatedLists = state.lists.data.map((list) => {
-        if (list.id === action.id) {
+        if (list.slug === action.slug) {
           return action.list;
         }
 
@@ -92,7 +92,7 @@ const listReducer = (state: ListState, action: ListAction): ListState => {
         throw new Error(`User lists not yet loaded`);
       }
 
-      const newLists = state.lists.data.filter((list) => list.id !== action.id);
+      const newLists = state.lists.data.filter((list) => list.slug !== action.slug);
 
       return {
         ...state,
@@ -108,7 +108,7 @@ const listReducer = (state: ListState, action: ListAction): ListState => {
       }
 
       const updatedLists = state.lists.data.map((list) => {
-        if (list.id === action.id) {
+        if (list.slug === action.slug) {
           const currentItems = list.items || [];
           const updatedItems = [...currentItems, action.item].sort((a, b) =>
             a.title.localeCompare(b.title)
@@ -137,7 +137,7 @@ const listReducer = (state: ListState, action: ListAction): ListState => {
       }
 
       const updatedLists = state.lists.data.map((list) => {
-        if (list.id === action.id) {
+        if (list.slug === action.slug) {
           const currentItems = list.items || [];
           const updatedItems = currentItems.filter((item) => item.id !== action.itemId);
 
@@ -161,13 +161,13 @@ const listReducer = (state: ListState, action: ListAction): ListState => {
     case 'SET_SELECTED_LIST': {
       return {
         ...state,
-        selectedId: action.id,
+        selectedSlug: action.slug,
       };
     }
     case 'CLEAR_SELECTED_LIST': {
       return {
         ...state,
-        selectedId: undefined,
+        selectedSlug: undefined,
       };
     }
     default:

@@ -24,7 +24,7 @@ const List = ({ list, onEdit, onDelete }: ListProps) => {
   const listDispatch = useListDispatch();
 
   // Derived state
-  const { id, name, items } = list;
+  const { slug, name, items } = list;
 
   // Local state
   const [showMenu, setShowMenu] = useState(false);
@@ -71,7 +71,7 @@ const List = ({ list, onEdit, onDelete }: ListProps) => {
 
   const handleAddToList = () => {
     // Set global state
-    listDispatch({ type: 'SET_SELECTED_LIST', id });
+    listDispatch({ type: 'SET_SELECTED_LIST', slug });
 
     // Redirect home
     router.push(`/`);
